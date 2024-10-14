@@ -11,7 +11,7 @@ const createProductController = catchAsync(async (req, res, next) => {
     const result = await productService.createProduct(req.body);
     console.log(result, " THis is the resutl");
     sendResponse(res, {
-      statusCode: 5000,
+      statusCode: httpStatus.OK,
       success: true,
       message: "All Products",
       data: result,
@@ -53,11 +53,14 @@ const getFeaturedProductsController = catchAsync(async (req, res, next) => {
 const updatedProductController = catchAsync(async (req, res, next) => {
   try {
     const { id } = req.params;
-    const result = await productService.updateProductInfo(id, req.body);
+    const result = await productService.updateProductInfo(
+      id,
+      req.body.updateInfo
+    );
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Booking updated successfully",
+      message: "Product updated successfully",
       data: result,
     });
   } catch (error) {

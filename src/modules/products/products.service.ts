@@ -4,9 +4,7 @@ import { productModel } from "./products.model";
 
 //  Service for creating product
 const createProduct = async (payload: TProducts) => {
-  console.log(payload);
   const products = await productModel.create(payload);
-  console.log(products);
   return products;
 };
 
@@ -29,17 +27,25 @@ const updateProductInfo = async (id: string, payloads: Partial<TProducts>) => {
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
-    const bookingId = await productModel.findById(id);
-    if (!bookingId) {
-      throw new Error("There is no Id");
-    }
-    const updatedBookings = await productModel.findByIdAndUpdate(id, payloads, {
-      new: true,
-      session,
-    });
+    const updatedInfo = {
+      $set: {
+        title: payloads?.title,
+        price: payloads?.price,
+        brand: payloads?.brand,
+      },
+    };
+    const updatedProducts = await productModel.findByIdAndUpdate(
+      id,
+      updatedInfo,
+      {
+        new: true,
+        upsert: true,
+        session,
+      }
+    );
     await session.commitTransaction();
     await session.endSession();
-    return updatedBookings;
+    return updatedProducts;
   } catch (error) {
     await session.abortTransaction();
     await session.endSession();
